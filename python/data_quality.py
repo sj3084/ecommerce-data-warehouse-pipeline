@@ -1,37 +1,61 @@
 from db_connector import get_connection
 
-def check_nulls(cursor, table, column):
-    cursor.execute(f"SELECT COUNT(*) FROM {table} WHERE {column} IS NULL")
-    return cursor.fetchone()[0]
-
-def check_negative(cursor, table, column):
-    cursor.execute(f"SELECT COUNT(*) FROM {table} WHERE {column} < 0")
+def scalar_check(cursor, query):
+    cursor.execute(query)
     return cursor.fetchone()[0]
 
 def run_data_quality_checks():
     conn = get_connection()
     cur = conn.cursor()
 
-    report_lines = []
+    report = []
 
-    checks = [
-        ("GOLD.fact_orders","order_total_usd"),
-        ("GOLD.fact_order_items","item_total_usd"),
-        ("GOLD.fact_payments","amount_usd")
-    ]
+    checks = {
+        "fact_orders.order_total_usd NULL": 
+            "SELECT COUNT(*) FROM GOLD.fact_orders WHERE order_total_usd IS NULL",
 
-    for table, column in checks:
-        nulls = check_nulls(cur, table, column)
-        negatives = check_negative(cur, table, column)
+        "fact_orders.order_total_usd NEGATIVE":
+            "SELECT COUNT(*) FROM GOLD.fact_orders WHERE order_total_usd < 0",
 
-        line = f"{table}.{column} -> NULLS={nulls}, NEGATIVES={negatives}"
-        report_lines.append(line)
+        "fact_order_items.item_total_usd NULL":
+            "SELECT COUNT(*) FROM GOLD.fact_order_items WHERE item_total_usd IS NULL",
+
+        "fact_payments.amount_usd NEGATIVE":
+            "SELECT COUNT(*) FROM GOLD.fact_payments WHERE amount_usd < 0",
+
+        "fact_orders.customer_key NULL":
+            "SELECT COUNT(*) FROM GOLD.fact_orders WHERE customer_key IS NULL",
+
+        "fact_orders.date_key NULL":
+            "SELECT COUNT(*) FROM GOLD.fact_orders WHERE date_key IS NULL",
+
+        "fact_orders invalid customer FK":
+            """SELECT COUNT(*) 
+               FROM GOLD.fact_orders fo
+               LEFT JOIN GOLD.dim_customer dc
+               ON fo.customer_key = dc.customer_key
+               WHERE fo.customer_key IS NOT NULL
+               AND dc.customer_key IS NULL""",
+
+        "mart_monthly_sales has_rows":
+            "SELECT COUNT(*) FROM MART.mart_monthly_sales"
+    }
+
+    for name, query in checks.items():
+        result = scalar_check(cur, query)
+
+        if "has_rows" in name:
+            status = "FAIL" if result == 0 else "PASS"
+        else:
+            status = "PASS" if result == 0 else "FAIL"
+
+        report.append(f"{name} -> {status} ({result})")
 
     cur.close()
     conn.close()
 
     with open("reports/data_quality_report.txt","w") as f:
-        for l in report_lines:
-            f.write(l + "\n")
+        for line in report:
+            f.write(line + "\n")
 
-    print("Data quality checks completed successfully.")
+    print("Enterprise data quality checks completed.")
