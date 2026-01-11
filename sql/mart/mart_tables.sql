@@ -5,25 +5,31 @@ SELECT
     d.year,
     d.month,
     COUNT(DISTINCT fo.order_id) AS total_orders,
-    SUM(COALESCE(fo.order_total_usd,0)) AS total_revenue_usd
+    SUM(COALESCE(fo.order_total_usd, 0)) AS total_revenue_usd
 FROM GOLD.fact_orders fo
 JOIN GOLD.dim_date d
     ON fo.date_key = d.date_key
 WHERE fo.order_status NOT IN ('CANCELLED','FAILED')
 GROUP BY
-    d.date_key, d.year, d.month;
+    d.date_key,
+    d.year,
+    d.month;
+
+SELECT * FROM MART.mart_daily_sales;
 
 -- MONTHLY SALES
 CREATE OR REPLACE VIEW MART.mart_monthly_sales AS
 SELECT
-    d.year_month,
+    CONCAT(d.year, '-', LPAD(d.month, 2, '0')) AS year_month,
     COUNT(DISTINCT fo.order_id) AS total_orders,
-    SUM(COALESCE(fo.order_total_usd,0)) AS total_revenue_usd
+    SUM(COALESCE(fo.order_total_usd, 0)) AS total_revenue_usd
 FROM GOLD.fact_orders fo
 JOIN GOLD.dim_date d
     ON fo.date_key = d.date_key
 WHERE fo.order_status NOT IN ('CANCELLED','FAILED')
-GROUP BY d.year_month;
+GROUP BY
+    d.year,
+    d.month;
 
 SELECT * FROM mart.mart_monthly_sales ORDER BY year_month;
 

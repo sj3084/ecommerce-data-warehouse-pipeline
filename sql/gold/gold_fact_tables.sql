@@ -12,7 +12,7 @@ FROM SILVER.orders_silver o
 LEFT JOIN GOLD.dim_customer dc 
     ON o.customer_id = dc.customer_id
 LEFT JOIN GOLD.dim_date d 
-    ON o.order_date = d.date_key
+    ON DATE_TRUNC('DAY', o.order_date) = d.date_key
 LEFT JOIN GOLD.fx_rates fx 
     ON o.currency = fx.currency;
 
