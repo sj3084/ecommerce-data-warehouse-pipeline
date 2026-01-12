@@ -1,3 +1,8 @@
-GOLD.fact_orders.order_total_usd -> NULLS=0, NEGATIVES=0
-GOLD.fact_order_items.item_total_usd -> NULLS=0, NEGATIVES=0
-GOLD.fact_payments.amount_usd -> NULLS=0, NEGATIVES=0
+fact_orders.order_total_usd NULL -> PASS (0)
+fact_orders.order_total_usd NEGATIVE -> PASS (0)
+fact_order_items.item_total_usd NULL -> PASS (0)
+fact_payments.amount_usd NEGATIVE -> PASS (0)
+fact_orders.customer_key NULL -> PASS (0)
+fact_orders.date_key NULL -> PASS (0)
+fact_orders invalid customer FK -> PASS (0)
+mart_monthly_sales has_rows -> PASS (24)
