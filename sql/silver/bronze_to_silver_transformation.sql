@@ -14,8 +14,7 @@ FROM (
            ROW_NUMBER() OVER(PARTITION BY customer_id ORDER BY load_timestamp DESC) rn
     FROM BRONZE.customers_raw
 )
-WHERE rn = 1
-  AND email IS NOT NULL;
+WHERE rn = 1;
 
 -- PRODUCTS
 CREATE OR REPLACE TABLE SILVER.products_silver AS
@@ -104,7 +103,7 @@ SELECT
     s.shipment_date,
     s.delivery_date,
     s.carrier,
-    s.shipment_status,
+    s.shipment_status
 FROM (
     SELECT *,
            ROW_NUMBER() OVER(PARTITION BY shipment_id ORDER BY load_timestamp DESC) rn

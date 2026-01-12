@@ -1,4 +1,4 @@
-CREATE OR REPLACE TABLE BRONZE.products_raw (
+CREATE TABLE IF NOT EXISTS BRONZE.products_raw (
     product_id STRING,
     product_name STRING,
     category STRING,
@@ -9,7 +9,7 @@ CREATE OR REPLACE TABLE BRONZE.products_raw (
     load_timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE OR REPLACE TABLE BRONZE.customers_raw (
+CREATE TABLE IF NOT EXISTS BRONZE.customers_raw (
     customer_id STRING,
     first_name STRING,
     last_name STRING,
@@ -21,7 +21,7 @@ CREATE OR REPLACE TABLE BRONZE.customers_raw (
     load_timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE OR REPLACE TABLE BRONZE.shipments_raw (
+CREATE TABLE IF NOT EXISTS BRONZE.shipments_raw (
     shipment_id STRING,
     order_id STRING,
     shipment_date TIMESTAMP_NTZ,
@@ -31,7 +31,7 @@ CREATE OR REPLACE TABLE BRONZE.shipments_raw (
     load_timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE OR REPLACE TABLE BRONZE.orders_raw (
+CREATE TABLE IF NOT EXISTS BRONZE.orders_raw (
     order_id STRING,
     customer_id STRING,
     order_date TIMESTAMP_NTZ,
@@ -41,7 +41,7 @@ CREATE OR REPLACE TABLE BRONZE.orders_raw (
     load_timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE OR REPLACE TABLE BRONZE.order_items_raw (
+CREATE TABLE IF NOT EXISTS BRONZE.order_items_raw (
     order_item_id STRING,
     order_id STRING,
     product_id STRING,
@@ -50,7 +50,7 @@ CREATE OR REPLACE TABLE BRONZE.order_items_raw (
     load_timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE OR REPLACE TABLE BRONZE.payments_raw (
+CREATE TABLE IF NOT EXISTS BRONZE.payments_raw (
     payment_id STRING,
     order_id STRING,
     payment_date TIMESTAMP_NTZ,
